@@ -11,6 +11,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onCommand:text-refactoring.checkCase",
     "onCommand:text-refactoring.toCamelCase",
     "onCommand:text-refactoring.toSnakeCase",
     "onCommand:text-refactoring.toPascalCase",
@@ -22,6 +23,11 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "text-refactoring.checkCase",
+        "title": "Check Case",
+        "category": "Text Refactoring"
+      },
       {
         "command": "text-refactoring.toCamelCase",
         "title": "To camelCase",
@@ -60,6 +66,11 @@
     ],
     "menus": {
       "editor/context": [
+        {
+          "command": "text-refactoring.checkCase",
+          "group": "textRefactoring@0",
+          "when": "editorTextFocus"
+        },
         {
           "command": "text-refactoring.toCamelCase",
           "group": "textRefactoring@1",
@@ -133,7 +144,7 @@
         "textRefactoring.maxEmptyLines": {
           "type": "number",
           "default": 1,
-          "description": "Максимально допустимое количество пустых строк подряд (для очистки и статистики)."
+          "description": "Максимально допустимое количество пустых строк подряд."
         }
       }
     }
