@@ -1,0 +1,163 @@
+{
+  "name": "text-refactoring",
+  "displayName": "Text Refactoring",
+  "description": "Automate routine text operations",
+  "publisher": "student",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.140.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:text-refactoring.toCamelCase",
+    "onCommand:text-refactoring.toSnakeCase",
+    "onCommand:text-refactoring.toPascalCase",
+    "onCommand:text-refactoring.cleanBlankLines",
+    "onCommand:text-refactoring.removeExtraSpaces",
+    "onCommand:text-refactoring.removeDuplicateLines",
+    "onCommand:text-refactoring.showStatistics"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "text-refactoring.toCamelCase",
+        "title": "To camelCase",
+        "category": "Text Refactoring"
+      },
+      {
+        "command": "text-refactoring.toSnakeCase",
+        "title": "To snake_case",
+        "category": "Text Refactoring"
+      },
+      {
+        "command": "text-refactoring.toPascalCase",
+        "title": "To PascalCase",
+        "category": "Text Refactoring"
+      },
+      {
+        "command": "text-refactoring.cleanBlankLines",
+        "title": "Clean blank lines",
+        "category": "Text Refactoring"
+      },
+      {
+        "command": "text-refactoring.removeExtraSpaces",
+        "title": "Remove extra spaces",
+        "category": "Text Refactoring"
+      },
+      {
+        "command": "text-refactoring.removeDuplicateLines",
+        "title": "Remove duplicate lines",
+        "category": "Text Refactoring"
+      },
+      {
+        "command": "text-refactoring.showStatistics",
+        "title": "Show Text Statistics",
+        "category": "Text Refactoring"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "text-refactoring.toCamelCase",
+          "group": "textRefactoring@1",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "text-refactoring.toSnakeCase",
+          "group": "textRefactoring@2",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "text-refactoring.toPascalCase",
+          "group": "textRefactoring@3",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "text-refactoring.cleanBlankLines",
+          "group": "textRefactoring@4",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "text-refactoring.removeExtraSpaces",
+          "group": "textRefactoring@5",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "text-refactoring.removeDuplicateLines",
+          "group": "textRefactoring@6",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "text-refactoring.showStatistics",
+          "group": "textRefactoring@7",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Text Refactoring Settings",
+      "properties": {
+        "textRefactoring.enableCamelCase": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать команду 'To camelCase' в меню."
+        },
+        "textRefactoring.enableSnakeCase": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать команду 'To snake_case' в меню."
+        },
+        "textRefactoring.enablePascalCase": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать команду 'To PascalCase' в меню."
+        },
+        "textRefactoring.enableCleanBlankLines": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать команду 'Clean blank lines' в меню."
+        },
+        "textRefactoring.enableRemoveExtraSpaces": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать команду 'Remove extra spaces' в меню."
+        },
+        "textRefactoring.enableRemoveDuplicateLines": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать команду 'Remove duplicate lines' в меню."
+        },
+        "textRefactoring.maxEmptyLines": {
+          "type": "number",
+          "default": 1,
+          "description": "Максимально допустимое количество пустых строк подряд (для очистки и статистики)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.140.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "typescript-eslint": "^8.61.1",
+    "eslint": "^10.5.0",
+    "typescript": "^6.0.3",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  }
+}
