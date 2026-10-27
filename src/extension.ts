@@ -1,43 +1,63 @@
 import * as vscode from 'vscode';
 
-// Разбиваем текст на слова
-function splitWords(text: string): string[] {
-    const normalized = text
-        .replace(/([a-z])([A-Z])/g, '$1 $2')
-        .replace(/[^a-zA-Z0-9]+/g, ' ')
-        .trim();
-    return normalized.length ? normalized.split(/\s+/) : [];
-}
-
-// НОВАЯ ФУНКЦИЯ: обрабатывает текст построчно, чтобы не ломать переносы строк
+// Обрабатывает текст построчно
 function processLines(text: string, processor: (line: string) => string): string {
     return text.split(/\r?\n/).map(line => {
-        if (!line.trim()) return line; // пустые строки не трогаем
+        if (!line.trim()) return line;
         return processor(line);
     }).join('\n');
 }
 
+// Умная обработка идентификаторов, которая не трогает строки и ключевые слова
+function processIdentifiers(line: string, convertFn: (word: string) => string): string {
+    // Разделяем строку по кавычкам, чтобы не менять текст внутри строк
+    const parts = line.split(/(".*?"|'.*?')/g);
+    return parts.map((part, index) => {
+        // Нечетные индексы — это строки в кавычках, их пропускаем
+        if (index % 2 === 1) return part;
+        
+        // В остальных частях ищем слова (идентификаторы)
+        return part.replace(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g, (word) => {
+            // Список ключевых слов C++, которые не нужно менять
+            const keywords = [
+                'include', 'define', 'using', 'namespace', 'void', 'const', 'int', 'for', 
+                'if', 'else', 'return', 'cout', 'cin', 'endl', 'std', 'main', 'char', 
+                'bool', 'float', 'double', 'while', 'do', 'switch', 'case', 'break', 
+                'continue', 'struct', 'class', 'public', 'private', 'true', 'false', 'nullptr'
+            ];
+            
+            // Если это ключевое слово, слово без букв или длина <= 1 (например, i, n) — пропускаем
+            if (keywords.includes(word.toLowerCase()) || !/[a-zA-Z]/.test(word) || word.length <= 1) {
+                return word;
+            }
+            
+            return convertFn(word);
+        });
+    }).join('');
+}
+
 function toCamelCase(text: string): string {
     return processLines(text, (line) => {
-        const words = splitWords(line);
-        if (!words.length) return line;
-        return words.map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+        return processIdentifiers(line, (word) => {
+            return word.replace(/_([a-zA-Z0-9])/g, (_, letter) => letter.toUpperCase());
+        });
     });
 }
 
 function toSnakeCase(text: string): string {
     return processLines(text, (line) => {
-        const words = splitWords(line);
-        if (!words.length) return line;
-        return words.map(w => w.toLowerCase()).join('_');
+        return processIdentifiers(line, (word) => {
+            return word.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+        });
     });
 }
 
 function toPascalCase(text: string): string {
     return processLines(text, (line) => {
-        const words = splitWords(line);
-        if (!words.length) return line;
-        return words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+        return processIdentifiers(line, (word) => {
+            let camel = word.replace(/_([a-zA-Z0-9])/g, (_, letter) => letter.toUpperCase());
+            return camel.charAt(0).toUpperCase() + camel.slice(1);
+        });
     });
 }
 
