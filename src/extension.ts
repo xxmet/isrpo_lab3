@@ -9,41 +9,56 @@ function splitWords(text: string): string[] {
     return normalized.length ? normalized.split(/\s+/) : [];
 }
 
+// НОВАЯ ФУНКЦИЯ: обрабатывает текст построчно, чтобы не ломать переносы строк
+function processLines(text: string, processor: (line: string) => string): string {
+    return text.split(/\r?\n/).map(line => {
+        if (!line.trim()) return line; // пустые строки не трогаем
+        return processor(line);
+    }).join('\n');
+}
+
 function toCamelCase(text: string): string {
-    const words = splitWords(text);
-    if (!words.length) return text;
-    return words.map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+    return processLines(text, (line) => {
+        const words = splitWords(line);
+        if (!words.length) return line;
+        return words.map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+    });
 }
 
 function toSnakeCase(text: string): string {
-    return splitWords(text).map(w => w.toLowerCase()).join('_');
+    return processLines(text, (line) => {
+        const words = splitWords(line);
+        if (!words.length) return line;
+        return words.map(w => w.toLowerCase()).join('_');
+    });
 }
 
 function toPascalCase(text: string): string {
-    return splitWords(text).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+    return processLines(text, (line) => {
+        const words = splitWords(line);
+        if (!words.length) return line;
+        return words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+    });
 }
 
 // Функция подсчета стилей
 function countCases(text: string) {
-    // Ищем все слова (последовательности букв, цифр и подчеркиваний)
     const words = text.match(/[a-zA-Z0-9_]+/g) || [];
-    
     let camel = 0, snake = 0, pascal = 0, constant = 0, other = 0;
 
     for (const word of words) {
         if (/^[A-Z0-9_]+$/.test(word) && /[A-Z]/.test(word)) {
-            constant++; // CONSTANT_CASE
+            constant++;
         } else if (/^[a-z0-9]+(?:_[a-z0-9]+)+$/.test(word)) {
-            snake++; // snake_case
+            snake++;
         } else if (/^[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]+)*$/.test(word)) {
-            pascal++; // PascalCase
+            pascal++;
         } else if (/^[a-z]+(?:[A-Z][a-z0-9]+)+$/.test(word)) {
-            camel++; // camelCase
+            camel++;
         } else {
-            other++; // обычные слова, цифры и т.д.
+            other++;
         }
     }
-    
     return { total: words.length, camel, snake, pascal, constant, other };
 }
 
@@ -81,7 +96,6 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     context.subscriptions.push(
-        // Команда проверки стилей (теперь выводит статистику по словам)
         vscode.commands.registerCommand('text-refactoring.checkCase', () => {
             const editor = vscode.window.activeTextEditor;
             if (!editor) return;
@@ -118,7 +132,6 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
-    // Статистика и визуализация
     context.subscriptions.push(
         vscode.commands.registerCommand('text-refactoring.showStatistics', () => {
             const editor = vscode.window.activeTextEditor;
@@ -163,7 +176,6 @@ export function activate(context: vscode.ExtensionContext) {
     }, null, context.subscriptions);
 }
 
-// HTML для визуализации (добавили полоски для стилей)
 function getWebviewContent(total: number, empty: number, dupes: number, spaces: number, caseStats: any): string {
     const max = Math.max(total, empty, dupes, spaces, caseStats.camel, caseStats.snake, caseStats.pascal, caseStats.constant, 1);
     
