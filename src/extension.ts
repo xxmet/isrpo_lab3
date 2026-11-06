@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-// Обрабатывает текст построчно
 function processLines(text: string, processor: (line: string) => string): string {
     return text.split(/\r?\n/).map(line => {
         if (!line.trim()) return line;
@@ -8,17 +7,13 @@ function processLines(text: string, processor: (line: string) => string): string
     }).join('\n');
 }
 
-// Умная обработка идентификаторов, которая не трогает строки и ключевые слова
 function processIdentifiers(line: string, convertFn: (word: string) => string): string {
-    // Разделяем строку по кавычкам, чтобы не менять текст внутри строк
     const parts = line.split(/(".*?"|'.*?')/g);
+    
     return parts.map((part, index) => {
-        // Нечетные индексы — это строки в кавычках, их пропускаем
         if (index % 2 === 1) return part;
         
-        // В остальных частях ищем слова (идентификаторы)
         return part.replace(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g, (word) => {
-            // Список ключевых слов C++, которые не нужно менять
             const keywords = [
                 'include', 'define', 'using', 'namespace', 'void', 'const', 'int', 'for', 
                 'if', 'else', 'return', 'cout', 'cin', 'endl', 'std', 'main', 'char', 
@@ -26,7 +21,6 @@ function processIdentifiers(line: string, convertFn: (word: string) => string): 
                 'continue', 'struct', 'class', 'public', 'private', 'true', 'false', 'nullptr'
             ];
             
-            // Если это ключевое слово, слово без букв или длина <= 1 (например, i, n) — пропускаем
             if (keywords.includes(word.toLowerCase()) || !/[a-zA-Z]/.test(word) || word.length <= 1) {
                 return word;
             }
@@ -61,7 +55,6 @@ function toPascalCase(text: string): string {
     });
 }
 
-// Функция подсчета стилей
 function countCases(text: string) {
     const words = text.match(/[a-zA-Z0-9_]+/g) || [];
     let camel = 0, snake = 0, pascal = 0, constant = 0, other = 0;
